@@ -10,6 +10,7 @@ class EmployeeController extends Controller
     public function index() {
         $employees = Employee::all();
       //  dd($employees);
+      //$employees = Employee::paginate(2);
          return view('employees.index', compact('employees'));
        // return view ('employees.index',['employees'=>$employees]);
     }
@@ -19,11 +20,25 @@ class EmployeeController extends Controller
     }
 
     public function store(Request $request) {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:employees,email',
-            'position' => 'required'
-        ]);
+        // $request->validate([
+        //     'name' => 'required',
+        //     'email' => 'required|email|unique:employees,email',
+        //     'position' => 'required'
+        // ]);
+
+         $request->validate([
+        'name' => 'required|regex:/^[A-Za-z\s]+$/',
+       // 'email' => 'required|email|unique:employees,email',
+       'email' => [
+    'required',
+    'email',
+    'unique:employees,email',
+    'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
+],
+        'position' => 'required'
+    ], [
+        'name.regex' => 'The name must contain only letters and spaces.',
+    ]);
 
         Employee::create($request->all());
         return redirect()->route('employees.index')->with('success', 'Employee created successfully!');
@@ -34,12 +49,25 @@ class EmployeeController extends Controller
     }
 
     public function update(Request $request, Employee $employee) {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:employees,email,' . $employee->id,
-            'position' => 'required'
-        ]);
+        // $request->validate([
+        //     'name' => 'required',
+        //     'email' => 'required|email|unique:employees,email,' . $employee->id,
+        //     'position' => 'required'
+        // ]);
 
+         $request->validate([
+        'name' => 'required|regex:/^[A-Za-z\s]+$/',
+        //'email' => 'required|email|unique:employees,email',
+        'email' => [
+    'required',
+    'email',
+    'unique:employees,email',
+    'regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/'
+],
+        'position' => 'required'
+    ], [
+        'name.regex' => 'The name must contain only letters and spaces.',
+    ]);
         $employee->update($request->all());
         return redirect()->route('employees.index')->with('success', 'Employee updated successfully!');
     }
